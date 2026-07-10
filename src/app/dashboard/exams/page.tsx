@@ -22,6 +22,14 @@ const emptyNodes: ExamNodes = {
   medicalExam: '',
 }
 
+function isExamExpired(exam: Exam): boolean {
+  const nodes = exam.nodes as unknown as Record<string, string>
+  const today = new Date().toISOString().split('T')[0]
+  const filledNodes = Object.values(nodes).filter((v) => v && v.length > 0)
+  if (filledNodes.length === 0) return false
+  return filledNodes.every((date) => date <= today)
+}
+
 export default function ExamsPage() {
   const [exams, setExams] = useState<Exam[]>([])
   const [loading, setLoading] = useState(true)
@@ -227,62 +235,69 @@ export default function ExamsPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {exams.map((exam) => (
-            <div
-              key={exam.id}
-              className={`bg-white rounded-xl shadow-sm p-6 ${
-                !exam.isEnabled ? 'opacity-60' : ''
-              }`}
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900">{exam.examName}</h3>
-                  <span
-                    className={`inline-block mt-1 px-2 py-0.5 rounded text-xs font-medium ${
-                      exam.isEnabled
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-gray-100 text-gray-500'
-                    }`}
-                  >
-                    {exam.isEnabled ? '已启用' : '已禁用'}
-                  </span>
+          {exams.map((exam) => {
+            const expired = isExamExpired(exam)
+            return (
+              <div
+                key={exam.id}
+                className={`bg-white rounded-xl shadow-sm p-6 ${
+                  !exam.isEnabled ? 'opacity-60' : ''
+                }`}
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">{exam.examName}</h3>
+                    <span
+                      className={`inline-block mt-1 px-2 py-0.5 rounded text-xs font-medium ${
+                        expired
+                          ? 'bg-red-100 text-red-700'
+                          : exam.isEnabled
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-100 text-gray-500'
+                      }`}
+                    >
+                      {expired ? '已过期' : exam.isEnabled ? '已启用' : '已禁用'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleToggleEnabled(exam)}
+                      className={`text-sm hover:underline ${
+                        exam.isEnabled ? 'text-gray-500 hover:text-primary' : 'text-primary'
+                      }`}
+                    >
+                      {exam.isEnabled ? '禁用' : '启用'}
+                    </button>
+                    <button
+                      onClick={() => handleEdit(exam)}
+                      className="text-sm text-primary hover:underline"
+                    >
+                      编辑
+                    </button>
+                    <button
+                      onClick={() => handleDelete(exam.id)}
+                      className="text-sm text-danger hover:underline"
+                    >
+                      删除
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleToggleEnabled(exam)}
-                    className="text-sm text-gray-500 hover:text-primary"
-                  >
-                    {exam.isEnabled ? '禁用' : '启用'}
-                  </button>
-                  <button
-                    onClick={() => handleEdit(exam)}
-                    className="text-sm text-primary hover:underline"
-                  >
-                    编辑
-                  </button>
-                  <button
-                    onClick={() => handleDelete(exam.id)}
-                    className="text-sm text-danger hover:underline"
-                  >
-                    删除
-                  </button>
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {(Object.keys(nodeLabels) as Array<keyof ExamNodes>).map((key) => {
-                  const value = (exam.nodes as Record<string, string>)[key]
-                  if (!value) return null
-                  return (
-                    <div key={key} className="text-sm">
-                      <span className="text-gray-500">{nodeLabels[key]}：</span>
-                      <span className="text-gray-900">{value}</span>
-                    </div>
-                  )
-                })}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {(Object.keys(nodeLabels) as Array<keyof ExamNodes>).map((key) => {
+                    const value = (exam.nodes as unknown as Record<string, string>)[key]
+                    if (!value) return null
+                    return (
+                      <div key={key} className="text-sm">
+                        <span className="text-gray-500">{nodeLabels[key]}：</span>
+                        <span className="text-gray-900">{value}</span>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>
