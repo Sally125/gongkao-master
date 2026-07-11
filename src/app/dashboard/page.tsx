@@ -2,6 +2,7 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import CountdownBanner from '@/components/CountdownBanner'
 import NotificationReminder from '@/components/NotificationReminder'
+import WeeklyStats from '@/components/WeeklyStats'
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -18,6 +19,8 @@ export default async function DashboardPage() {
         </h1>
         <p className="opacity-90">今天也要加油备考哦！</p>
       </div>
+
+      <WeeklyStats />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white rounded-xl p-6 shadow-sm">

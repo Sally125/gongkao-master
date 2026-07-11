@@ -8,6 +8,7 @@ import { signOut } from 'next-auth/react'
 const navigation = [
   { name: '首页', href: '/dashboard', icon: '🏠' },
   { name: '考试管理', href: '/dashboard/exams', icon: '📋' },
+  { name: '智能Todo', href: '/dashboard/tasks', icon: '✅' },
   { name: '学习计划', href: '/dashboard/plans', icon: '📅' },
   { name: '复盘记录', href: '/dashboard/reviews', icon: '📝' },
   { name: '数据统计', href: '/dashboard/stats', icon: '📊' },
