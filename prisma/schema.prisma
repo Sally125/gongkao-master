@@ -30,6 +30,10 @@ model User {
   practiceRecords PracticeRecord[]
   tasks Task[]
   focusSessions FocusSession[]
+  idioms Idiom[]
+  wrongQuestions WrongQuestion[]
+  materials UserMaterial[]
+  dailyCards DailyCard[]
   userSettings UserSettings?
 
   @@map("users")
@@ -266,4 +270,95 @@ model FocusSession {
   task Task? @relation(fields: [taskId], references: [id], onDelete: SetNull)
 
   @@map("focus_sessions")
+}
+
+// ==================== 易错成语层 ====================
+model Idiom {
+  id            String   @id @default(cuid())
+  userId        String
+  word          String   // 成语
+  meaning       String   // 释义
+  notes         String?  // 备注
+
+  // 记忆进度
+  reviewStage   Int      @default(0)  // 0=新学, 1-5=复习阶段, 6=已掌握
+  nextReviewDate DateTime @default(now()) // 下次复习日期
+  isMastered    Boolean  @default(false)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("idioms")
+}
+
+// ==================== 复盘记录层 ====================
+model WrongQuestion {
+  id            String   @id @default(cuid())
+  userId        String
+  question      String   // 题干内容（文字或图片URL）
+  questionType  String   // 输入类型：text / image / ocr
+  myAnswer      String   // 我的答案
+  correctAnswer String   // 正确答案
+  errorReason   String   // 错误原因（计算失误/知识点盲区/审题不清等）
+  questionModule String  // 题型/知识模块（资料分析/中心理解等）
+  isGuessed     Boolean  @default(false) // 蒙对标记
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("wrong_questions")
+}
+
+// ==================== 申论积累层 ====================
+model Article {
+  id          String   @id @default(cuid())
+  title       String
+  source      String   // 人民日报/新华网
+  url         String
+  author      String?
+  content     String   // 原文HTML/纯文本
+  domain      String   // 基层治理/科技创新/民生保障/生态文明/法治建设/文化自信
+  publishDate DateTime
+  analysis    String?  // AI拆解结果JSON
+  createdAt   DateTime @default(now())
+
+  materials UserMaterial[]
+  dailyCards DailyCard[]
+
+  @@map("articles")
+}
+
+model UserMaterial {
+  id        String   @id @default(cuid())
+  userId    String
+  articleId String
+  type      String   // golden_sentence/case/norm_word/countermeasure
+  content   String   // 用户收藏的原文内容
+  tags      String?  // 主题标签JSON
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@map("user_materials")
+}
+
+model DailyCard {
+  id          String   @id @default(cuid())
+  userId      String
+  articleId   String?
+  content     String   // 金句/规范词原文
+  source      String   // 出处（文章标题）
+  topic       String   // 适用主题
+  reviewStage Int      @default(0)
+  nextReview  DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article Article? @relation(fields: [articleId], references: [id], onDelete: SetNull)
+
+  @@map("daily_cards")
 }

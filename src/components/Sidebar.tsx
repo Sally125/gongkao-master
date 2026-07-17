@@ -9,10 +9,14 @@ const navigation = [
   { name: '首页', href: '/dashboard', icon: '🏠' },
   { name: '考试管理', href: '/dashboard/exams', icon: '📋' },
   { name: '智能Todo', href: '/dashboard/tasks', icon: '✅' },
+  { name: '易错成语', href: '/dashboard/idioms', icon: '📖' },
+  { name: '每日复习', href: '/dashboard/review', icon: '🔄' },
+  { name: '复盘记录', href: '/dashboard/wrong-questions', icon: '📝' },
+  { name: '申论文章', href: '/dashboard/articles', icon: '📰' },
+  { name: '每日背诵', href: '/dashboard/daily-cards', icon: '📇' },
+  { name: '素材本', href: '/dashboard/materials', icon: '✨' },
   { name: '学习计划', href: '/dashboard/plans', icon: '📅' },
-  { name: '复盘记录', href: '/dashboard/reviews', icon: '📝' },
   { name: '数据统计', href: '/dashboard/stats', icon: '📊' },
-  { name: '题库练习', href: '/dashboard/practice', icon: '📚' },
   { name: '个人设置', href: '/dashboard/settings', icon: '⚙️' },
 ]
 
